@@ -1,0 +1,4 @@
+dependencies: []
+build_flags: []
+libraries:
+  - openenergymonitor/EmonLib@^4.0.0
