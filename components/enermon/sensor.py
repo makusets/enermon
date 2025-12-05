@@ -42,7 +42,6 @@ PLATFORM_SCHEMA = (
         }
     )
     .extend(cv.COMPONENT_SCHEMA)
-    .extend(sensor.SENSOR_PLATFORM_SCHEMA)
 )
 
 
