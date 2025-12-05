@@ -89,43 +89,43 @@ async def to_code(config):
         if i < len(ct_names) and ct_names[i]:
             name_base = ct_names[i]
 
-        current = sensor.new_sensor(config)
+        current = await sensor.new_sensor(config)  # <-- add await
         current.set_parent(var)
         current.set_name(f"{name_base} Current RMS")
         current.set_unit_of_measurement("A")
         cg.add(var.sensor_current_rms[i].assign(current))
 
-        power = sensor.new_sensor(config)
+        power = await sensor.new_sensor(config)  # <-- add await
         power.set_parent(var)
         power.set_name(f"{name_base} Active Power")
         power.set_unit_of_measurement("W")
         cg.add(var.sensor_power_w[i].assign(power))
 
-        ed = sensor.new_sensor(config)
+        ed = await sensor.new_sensor(config)  # <-- add await
         ed.set_parent(var)
         ed.set_name(f"{name_base} Energy Today")
         ed.set_unit_of_measurement("Wh")
         cg.add(var.sensor_energy_daily_wh[i].assign(ed))
 
-        ew = sensor.new_sensor(config)
+        ew = await sensor.new_sensor(config)  # <-- add await
         ew.set_parent(var)
         ew.set_name(f"{name_base} Energy Week")
         ew.set_unit_of_measurement("Wh")
         cg.add(var.sensor_energy_weekly_wh[i].assign(ew))
 
-        em = sensor.new_sensor(config)
+        em = await sensor.new_sensor(config)  # <-- add await
         em.set_parent(var)
         em.set_name(f"{name_base} Energy Month")
         em.set_unit_of_measurement("Wh")
         cg.add(var.sensor_energy_monthly_wh[i].assign(em))
 
-    voltage = sensor.new_sensor(config)
+    voltage = await sensor.new_sensor(config)  # <-- add await
     voltage.set_parent(var)
     voltage.set_name("Line Voltage RMS")
     voltage.set_unit_of_measurement("V")
     cg.add(var.sensor_voltage_rms.assign(voltage))
 
-    wifi = sensor.new_sensor(config)
+    wifi = await sensor.new_sensor(config)  # <-- add await
     wifi.set_parent(var)
     wifi.set_name("WiFi RSSI")
     wifi.set_unit_of_measurement("dBm")
