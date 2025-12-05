@@ -1,4 +1,0 @@
-dependencies: []
-build_flags: []
-libraries:
-  - EmonLib=https://github.com/openenergymonitor/EmonLib.git
