@@ -1,4 +1,4 @@
 dependencies: []
 build_flags: []
 libraries:
-  - openenergymonitor/EmonLib@^4.0.0
+  - EmonLib=https://github.com/openenergymonitor/EmonLib.git
