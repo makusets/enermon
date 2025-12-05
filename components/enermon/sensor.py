@@ -82,7 +82,7 @@ async def to_code(config):
         c_ct_cal.push_back(cc)
 
     var = cg.new_Pvariable(config[CONF_ID], c_ct_pins, c_a_per_v, c_cal_gain, c_cal_offset, c_ct_cal, voltage_pin, voltage_divider, voltage_cal, voltage_phase, sample_count)
-    await cg.register_component(var, config)
+    cg.add_component(var)
 
     for i in range(4):
         name_base = f"CT {i+1}"
