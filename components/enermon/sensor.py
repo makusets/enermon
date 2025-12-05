@@ -4,9 +4,6 @@ from esphome.components import sensor
 from esphome import pins
 from esphome.const import (
     CONF_ID,
-    CONF_SAMPLE_COUNT,
-    CONF_VOLTAGE_DIVIDER,
-    CONF_VOLTAGE_PIN,
 )
 
 DEPENDENCIES = []
@@ -21,8 +18,11 @@ CONF_CAL_GAIN = "cal_gain"
 CONF_CAL_OFFSET = "cal_offset"
 CONF_CT_CAL = "ct_cal"
 CONF_CT_NAMES = "ct_names"
+CONF_VOLTAGE_PIN = "voltage_pin"
+CONF_VOLTAGE_DIVIDER = "voltage_divider"
 CONF_VOLTAGE_CAL = "voltage_cal"
 CONF_VOLTAGE_PHASE = "voltage_phase"
+CONF_SAMPLE_COUNT = "sample_count"
 
 PLATFORM_SCHEMA = (
     cv.Schema(
