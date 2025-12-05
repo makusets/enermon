@@ -1,7 +1,10 @@
 #pragma once
 #include "esphome.h"
 #include "EmonLib.h"
+#include <vector>
+#include <array>
 
+namespace esphome {
 namespace enermon {
 
 class Enermon : public Component {
@@ -20,13 +23,13 @@ class Enermon : public Component {
   void setup() override;
   void loop() override;
 
-  std::array<sensor::Sensor*, 4> sensor_current_rms{};
-  std::array<sensor::Sensor*, 4> sensor_power_w{};  // signed active power (W)
-  std::array<sensor::Sensor*, 4> sensor_energy_daily_wh{};
-  std::array<sensor::Sensor*, 4> sensor_energy_weekly_wh{};
-  std::array<sensor::Sensor*, 4> sensor_energy_monthly_wh{};
-  sensor::Sensor *sensor_voltage_rms{nullptr};
-  sensor::Sensor *sensor_wifi_rssi{nullptr};
+  std::array<esphome::sensor::Sensor*, 4> sensor_current_rms{};
+  std::array<esphome::sensor::Sensor*, 4> sensor_power_w{};  // signed active power (W)
+  std::array<esphome::sensor::Sensor*, 4> sensor_energy_daily_wh{};
+  std::array<esphome::sensor::Sensor*, 4> sensor_energy_weekly_wh{};
+  std::array<esphome::sensor::Sensor*, 4> sensor_energy_monthly_wh{};
+  esphome::sensor::Sensor *sensor_voltage_rms{nullptr};
+  esphome::sensor::Sensor *sensor_wifi_rssi{nullptr};
 
  protected:
   std::vector<int> ct_pins_;
@@ -61,3 +64,4 @@ class Enermon : public Component {
 };
 
 }  // namespace enermon
+}  // namespace esphome
