@@ -2,12 +2,10 @@ import esphome.codegen as cg
 import esphome.config_validation as cv
 from esphome.components import sensor
 from esphome import pins
-from esphome.const import (
-    CONF_ID,
-)
+from esphome.const import CONF_ID
 
 DEPENDENCIES = []
-AUTO_LOAD = ["sensor"]
+AUTO_LOAD = []
 
 enermon_ns = cg.esphome_ns.namespace("enermon")
 Enermon = enermon_ns.class_("Enermon", cg.Component)
@@ -51,7 +49,6 @@ async def to_code(config):
     cal_gain = config.get(CONF_CAL_GAIN, [])
     cal_offset = config.get(CONF_CAL_OFFSET, [])
     ct_cal = config.get(CONF_CT_CAL, [])
-    ct_names = config.get(CONF_CT_NAMES, [])
     voltage_pin = config.get(CONF_VOLTAGE_PIN, -1)
     voltage_divider = config.get(CONF_VOLTAGE_DIVIDER, 80.0)
     voltage_cal = config.get(CONF_VOLTAGE_CAL, 23426.0)
@@ -83,43 +80,3 @@ async def to_code(config):
 
     var = cg.new_Pvariable(config[CONF_ID], c_ct_pins, c_a_per_v, c_cal_gain, c_cal_offset, c_ct_cal, voltage_pin, voltage_divider, voltage_cal, voltage_phase, sample_count)
     cg.add(var)
-
-    for i in range(4):
-        name_base = f"CT {i+1}"
-        if i < len(ct_names) and ct_names[i]:
-            name_base = ct_names[i]
-
-        current = cg.new_Pvariable(sensor.Sensor)
-        current.set_name(f"{name_base} Current RMS")
-        current.set_unit_of_measurement("A")
-        cg.add(var.sensor_current_rms[i].assign(current))
-
-        power = cg.new_Pvariable(sensor.Sensor)
-        power.set_name(f"{name_base} Active Power")
-        power.set_unit_of_measurement("W")
-        cg.add(var.sensor_power_w[i].assign(power))
-
-        ed = cg.new_Pvariable(sensor.Sensor)
-        ed.set_name(f"{name_base} Energy Today")
-        ed.set_unit_of_measurement("Wh")
-        cg.add(var.sensor_energy_daily_wh[i].assign(ed))
-
-        ew = cg.new_Pvariable(sensor.Sensor)
-        ew.set_name(f"{name_base} Energy Week")
-        ew.set_unit_of_measurement("Wh")
-        cg.add(var.sensor_energy_weekly_wh[i].assign(ew))
-
-        em = cg.new_Pvariable(sensor.Sensor)
-        em.set_name(f"{name_base} Energy Month")
-        em.set_unit_of_measurement("Wh")
-        cg.add(var.sensor_energy_monthly_wh[i].assign(em))
-
-    voltage = cg.new_Pvariable(sensor.Sensor)
-    voltage.set_name("Line Voltage RMS")
-    voltage.set_unit_of_measurement("V")
-    cg.add(var.sensor_voltage_rms.assign(voltage))
-
-    wifi = cg.new_Pvariable(sensor.Sensor)
-    wifi.set_name("WiFi RSSI")
-    wifi.set_unit_of_measurement("dBm")
-    cg.add(var.sensor_wifi_rssi.assign(wifi))
