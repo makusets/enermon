@@ -58,8 +58,8 @@ async def to_code(config):
     voltage_phase = config.get(CONF_VOLTAGE_PHASE, 0)
     sample_count = config.get(CONF_SAMPLE_COUNT, 200)
 
-    int_vector = cg.std_vector_template(cg.int_)
-    float_vector = cg.std_vector_template(cg.float_)
+    int_vector = cg.std_vector(cg.int_)
+    float_vector = cg.std_vector(cg.float_)
 
     c_ct_pins = int_vector()
     for p in ct_pins:
