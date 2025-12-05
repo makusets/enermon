@@ -4,6 +4,12 @@ from esphome.components import sensor
 from esphome import pins
 from esphome.const import CONF_ID
 
+cg.add_library(
+    name="EmonLib",
+    repository="https://github.com/openenergymonitor/EmonLib.git",
+    version=None,
+)
+
 DEPENDENCIES = []
 AUTO_LOAD = []
 
