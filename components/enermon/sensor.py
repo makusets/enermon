@@ -38,7 +38,7 @@ PLATFORM_SCHEMA = (
             cv.Optional(CONF_VOLTAGE_DIVIDER, default=80.0): cv.float_,
             cv.Optional(CONF_VOLTAGE_CAL, default=23426.0): cv.float_,
             cv.Optional(CONF_VOLTAGE_PHASE, default=0): cv.int_,
-            cv.Optional(CONF_SAMPLE_COUNT, default=200): cv.positive_int_,
+            cv.Optional(CONF_SAMPLE_COUNT, default=200): cv.positive_int,
         }
     )
     .extend(cv.COMPONENT_SCHEMA)
