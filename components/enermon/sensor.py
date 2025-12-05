@@ -24,7 +24,7 @@ CONF_VOLTAGE_CAL = "voltage_cal"
 CONF_VOLTAGE_PHASE = "voltage_phase"
 CONF_SAMPLE_COUNT = "sample_count"
 
-PLATFORM_SCHEMA = (
+CONFIG_SCHEMA = (
     cv.Schema(
         {
             cv.GenerateID(): cv.declare_id(Enermon),
