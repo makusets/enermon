@@ -90,7 +90,10 @@ async def to_code(config):
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_CURRENT,
             state_class=STATE_CLASS_MEASUREMENT,
-        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Current"): cv.string})
+        ).extend({
+            cv.GenerateID(): cv.declare_id(sensor.Sensor),
+            cv.Optional(CONF_NAME, default=f"{base_name} Current"): cv.string,
+        })
         current_conf = current_schema({})
 
         power_schema = sensor.sensor_schema(
@@ -98,7 +101,10 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_POWER,
             state_class=STATE_CLASS_MEASUREMENT,
-        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Power"): cv.string})
+        ).extend({
+            cv.GenerateID(): cv.declare_id(sensor.Sensor),
+            cv.Optional(CONF_NAME, default=f"{base_name} Power"): cv.string,
+        })
         power_conf = power_schema({})
 
         energy_day_schema = sensor.sensor_schema(
@@ -106,7 +112,10 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
-        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Energy Daily"): cv.string})
+        ).extend({
+            cv.GenerateID(): cv.declare_id(sensor.Sensor),
+            cv.Optional(CONF_NAME, default=f"{base_name} Energy Daily"): cv.string,
+        })
         energy_day_conf = energy_day_schema({})
 
         energy_week_schema = sensor.sensor_schema(
@@ -114,7 +123,10 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
-        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Energy Weekly"): cv.string})
+        ).extend({
+            cv.GenerateID(): cv.declare_id(sensor.Sensor),
+            cv.Optional(CONF_NAME, default=f"{base_name} Energy Weekly"): cv.string,
+        })
         energy_week_conf = energy_week_schema({})
 
         energy_month_schema = sensor.sensor_schema(
@@ -122,7 +134,10 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
-        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Energy Monthly"): cv.string})
+        ).extend({
+            cv.GenerateID(): cv.declare_id(sensor.Sensor),
+            cv.Optional(CONF_NAME, default=f"{base_name} Energy Monthly"): cv.string,
+        })
         energy_month_conf = energy_month_schema({})
 
         current = await sensor.new_sensor(current_conf)
@@ -143,7 +158,10 @@ async def to_code(config):
         accuracy_decimals=1,
         device_class=DEVICE_CLASS_VOLTAGE,
         state_class=STATE_CLASS_MEASUREMENT,
-    ).extend({cv.Optional(CONF_NAME, default="Mains Voltage"): cv.string})
+    ).extend({
+        cv.GenerateID(): cv.declare_id(sensor.Sensor),
+        cv.Optional(CONF_NAME, default="Mains Voltage"): cv.string,
+    })
     voltage_conf = voltage_schema({})
 
     wifi_schema = sensor.sensor_schema(
@@ -151,7 +169,10 @@ async def to_code(config):
         accuracy_decimals=0,
         device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
         state_class=STATE_CLASS_MEASUREMENT,
-    ).extend({cv.Optional(CONF_NAME, default="WiFi RSSI"): cv.string})
+    ).extend({
+        cv.GenerateID(): cv.declare_id(sensor.Sensor),
+        cv.Optional(CONF_NAME, default="WiFi RSSI"): cv.string,
+    })
     wifi_conf = wifi_schema({})
 
     voltage_sensor = await sensor.new_sensor(voltage_conf)
