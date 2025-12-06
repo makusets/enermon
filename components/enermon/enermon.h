@@ -11,12 +11,11 @@ class Enermon : public Component {
  public:
   Enermon() = default;  // simple default constructor
 
-  void set_config(const std::vector<int> &ct_pins,
-                  const std::vector<float> &ct_cal,
-                  int voltage_pin,
-                  float voltage_cal,
-                  float voltage_phase,
-                  unsigned int sample_count);
+  void add_ct_channel(int index, int ct_pin, float ct_cal);
+  void set_voltage_config(int voltage_pin,
+                          float voltage_cal,
+                          float voltage_phase,
+                          unsigned int sample_count);
 
   void setup() override;
   void loop() override;

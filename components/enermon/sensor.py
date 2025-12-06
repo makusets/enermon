@@ -53,19 +53,23 @@ async def to_code(config):
     var = cg.new_Pvariable(config[CONF_ID])
     await cg.register_component(var, config)
 
-    # Build std::vector<int> and std::vector<float>
-    int_vector = cg.std_vector(cg.int_)
-    float_vector = cg.std_vector(cg.float_)
+    ct_pins = config.get(CONF_CT_PINS, [])
+    ct_cal = config.get(CONF_CT_CAL, [])
 
-    c_ct_pins = int_vector()
-    for p in ct_pins:
-        c_ct_pins.push_back(p)
+    # Send each channel as simple ints/floats
+    for i, pin in enumerate(ct_pins):
+        cal = ct_cal[i] if i < len(ct_cal) else 1111.0
+        cg.add(var.add_ct_channel(i, pin, cal))
 
-    c_ct_cal = float_vector()
-    for cc in ct_cal:
-        c_ct_cal.push_back(cc)
+    voltage_pin = config.get(CONF_VOLTAGE_PIN, -1)
+    voltage_cal = config.get(CONF_VOLTAGE_CAL, 230.0)
+    voltage_phase = config.get(CONF_VOLTAGE_PHASE, 1.7)
+    sample_count = config.get(CONF_SAMPLE_COUNT, 200)
 
     # Call the C++ setter with properly ordered arguments
-    cg.add(var.set_config(c_ct_pins, c_ct_cal,
-                          voltage_pin, voltage_cal,
-                          voltage_phase, sample_count))
+    cg.add(var.set_voltage_config(
+        voltage_pin,
+        voltage_cal,
+        voltage_phase,
+        sample_count
+    ))

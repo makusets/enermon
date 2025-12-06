@@ -4,27 +4,38 @@
 namespace esphome {
 namespace enermon {
 
-void Enermon::set_config(const std::vector<int> &ct_pins,
-                         const std::vector<float> &ct_cal,
-                         int voltage_pin,
-                         float voltage_cal,
-                         float voltage_phase,
-                         unsigned int sample_count) {
-  ct_pins_      = ct_pins;
-  ct_cal_       = ct_cal;
-  voltage_pin_  = voltage_pin;
-  voltage_cal_  = voltage_cal;
-  voltage_phase_= voltage_phase;
-  sample_count_ = sample_count;
+Enermon::Enermon() = default;
 
-  ct_pins_.resize(4, -1);
-  ct_cal_.resize(4, 1111.0f);
+void Enermon::add_ct_channel(int index, int ct_pin, float ct_cal) {
+  if (index < 0) return;
+
+  if (ct_pins_.size() < static_cast<size_t>(index + 1))
+    ct_pins_.resize(index + 1, -1);
+  if (ct_cal_.size() < static_cast<size_t>(index + 1))
+    ct_cal_.resize(index + 1, 1111.0f);
+
+  ct_pins_[index] = ct_pin;
+  ct_cal_[index] = ct_cal;
+}
+
+void Enermon::set_voltage_config(int voltage_pin,
+                                 float voltage_cal,
+                                 float voltage_phase,
+                                 unsigned int sample_count) {
+  voltage_pin_   = voltage_pin;
+  voltage_cal_   = voltage_cal;
+  voltage_phase_ = voltage_phase;
+  sample_count_  = sample_count;
+
+  // Initialise your per-channel state if needed
+  if (ct_pins_.size() < 4)  ct_pins_.resize(4, -1);
+  if (ct_cal_.size() < 4)   ct_cal_.resize(4, 1111.0f);
 
   for (int i = 0; i < 4; ++i) {
-    last_irms_[i]           = 0.0f;
-    energy_daily_wh_[i]     = 0.0;
-    energy_weekly_wh_[i]    = 0.0;
-    energy_monthly_wh_[i]   = 0.0;
+    last_irms_[i]         = 0.0f;
+    energy_daily_wh_[i]   = 0.0;
+    energy_weekly_wh_[i]  = 0.0;
+    energy_monthly_wh_[i] = 0.0;
   }
 }
 
