@@ -81,44 +81,49 @@ async def to_code(config):
         )
     )
 
-    # Auto-create per-CT sensors
+    # Auto-create per-CT sensors so they are exposed to HA without YAML declarations
     for i, pin in enumerate(ct_pins):
         base_name = ct_names[i] if i < len(ct_names) else f"CT{i}"
 
-        current_conf = sensor.sensor_schema(
+        current_schema = sensor.sensor_schema(
             unit_of_measurement=UNIT_AMPERE,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_CURRENT,
             state_class=STATE_CLASS_MEASUREMENT,
-        ).schema({CONF_NAME: f"{base_name} Current"})
+        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Current"): cv.string})
+        current_conf = current_schema({})
 
-        power_conf = sensor.sensor_schema(
+        power_schema = sensor.sensor_schema(
             unit_of_measurement=UNIT_WATT,
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_POWER,
             state_class=STATE_CLASS_MEASUREMENT,
-        ).schema({CONF_NAME: f"{base_name} Power"})
+        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Power"): cv.string})
+        power_conf = power_schema({})
 
-        energy_day_conf = sensor.sensor_schema(
+        energy_day_schema = sensor.sensor_schema(
             unit_of_measurement="Wh",
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
-        ).schema({CONF_NAME: f"{base_name} Energy Daily"})
+        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Energy Daily"): cv.string})
+        energy_day_conf = energy_day_schema({})
 
-        energy_week_conf = sensor.sensor_schema(
+        energy_week_schema = sensor.sensor_schema(
             unit_of_measurement="Wh",
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
-        ).schema({CONF_NAME: f"{base_name} Energy Weekly"})
+        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Energy Weekly"): cv.string})
+        energy_week_conf = energy_week_schema({})
 
-        energy_month_conf = sensor.sensor_schema(
+        energy_month_schema = sensor.sensor_schema(
             unit_of_measurement="Wh",
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
-        ).schema({CONF_NAME: f"{base_name} Energy Monthly"})
+        ).extend({cv.Optional(CONF_NAME, default=f"{base_name} Energy Monthly"): cv.string})
+        energy_month_conf = energy_month_schema({})
 
         current = await sensor.new_sensor(current_conf)
         power = await sensor.new_sensor(power_conf)
@@ -133,19 +138,21 @@ async def to_code(config):
         cg.add(var.set_sensor_energy_monthly(i, energy_month))
 
     # Voltage and WiFi sensors
-    voltage_conf = sensor.sensor_schema(
+    voltage_schema = sensor.sensor_schema(
         unit_of_measurement=UNIT_VOLT,
         accuracy_decimals=1,
         device_class=DEVICE_CLASS_VOLTAGE,
         state_class=STATE_CLASS_MEASUREMENT,
-    ).schema({CONF_NAME: "Mains Voltage"})
+    ).extend({cv.Optional(CONF_NAME, default="Mains Voltage"): cv.string})
+    voltage_conf = voltage_schema({})
 
-    wifi_conf = sensor.sensor_schema(
+    wifi_schema = sensor.sensor_schema(
         unit_of_measurement=UNIT_DECIBEL_MILLIWATT,
         accuracy_decimals=0,
         device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
         state_class=STATE_CLASS_MEASUREMENT,
-    ).schema({CONF_NAME: "WiFi RSSI"})
+    ).extend({cv.Optional(CONF_NAME, default="WiFi RSSI"): cv.string})
+    wifi_conf = wifi_schema({})
 
     voltage_sensor = await sensor.new_sensor(voltage_conf)
     wifi_rssi = await sensor.new_sensor(wifi_conf)
