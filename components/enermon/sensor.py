@@ -16,8 +16,7 @@ from esphome.const import (
     UNIT_DECIBEL_MILLIWATT,
     UNIT_VOLT,
     UNIT_WATT,
-    UNIT_WATT_HOUR,
-)
+    )
 
 cg.add_library(
     name="EmonLib",
@@ -107,7 +106,7 @@ async def to_code(config):
         energy_day = await sensor.new_sensor(
             {
                 CONF_NAME: f"{base_name} Energy Daily",
-                "unit_of_measurement": UNIT_WATT_HOUR,
+                "unit_of_measurement": "Wh",
                 "accuracy_decimals": 1,
                 "device_class": DEVICE_CLASS_ENERGY,
                 "state_class": STATE_CLASS_TOTAL_INCREASING,
@@ -116,7 +115,7 @@ async def to_code(config):
         energy_week = await sensor.new_sensor(
             {
                 CONF_NAME: f"{base_name} Energy Weekly",
-                "unit_of_measurement": UNIT_WATT_HOUR,
+                "unit_of_measurement": "Wh",
                 "accuracy_decimals": 1,
                 "device_class": DEVICE_CLASS_ENERGY,
                 "state_class": STATE_CLASS_TOTAL_INCREASING,
@@ -125,7 +124,7 @@ async def to_code(config):
         energy_month = await sensor.new_sensor(
             {
                 CONF_NAME: f"{base_name} Energy Monthly",
-                "unit_of_measurement": UNIT_WATT_HOUR,
+                "unit_of_measurement": "Wh",
                 "accuracy_decimals": 1,
                 "device_class": DEVICE_CLASS_ENERGY,
                 "state_class": STATE_CLASS_TOTAL_INCREASING,
