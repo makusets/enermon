@@ -26,7 +26,7 @@ sensor:
     voltage_pin: 39
     voltage_cal: 230.0
     voltage_phase: 1.7
-    sample_count: 2000
+    sample_count: 200
 
 
 
