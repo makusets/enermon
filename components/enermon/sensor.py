@@ -91,7 +91,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_CURRENT,
             state_class=STATE_CLASS_MEASUREMENT,
         )({
-            CONF_ID: cg.allocate_id(sensor.Sensor),
+            cv.GenerateID(f"{base_name.lower()}_current"): cv.declare_id(sensor.Sensor),
             CONF_NAME: f"{base_name} Current",
         })
 
@@ -101,7 +101,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_POWER,
             state_class=STATE_CLASS_MEASUREMENT,
         )({
-            CONF_ID: cg.allocate_id(sensor.Sensor),
+            cv.GenerateID(f"{base_name.lower()}_power"): cv.declare_id(sensor.Sensor),
             CONF_NAME: f"{base_name} Power",
         })
 
@@ -111,7 +111,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         )({
-            CONF_ID: cg.allocate_id(sensor.Sensor),
+            cv.GenerateID(f"{base_name.lower()}_energy_daily"): cv.declare_id(sensor.Sensor),
             CONF_NAME: f"{base_name} Energy Daily",
         })
 
@@ -121,7 +121,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         )({
-            CONF_ID: cg.allocate_id(sensor.Sensor),
+            cv.GenerateID(f"{base_name.lower()}_energy_weekly"): cv.declare_id(sensor.Sensor),
             CONF_NAME: f"{base_name} Energy Weekly",
         })
 
@@ -131,7 +131,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         )({
-            CONF_ID: cg.allocate_id(sensor.Sensor),
+            cv.GenerateID(f"{base_name.lower()}_energy_monthly"): cv.declare_id(sensor.Sensor),
             CONF_NAME: f"{base_name} Energy Monthly",
         })
 
@@ -154,7 +154,7 @@ async def to_code(config):
         device_class=DEVICE_CLASS_VOLTAGE,
         state_class=STATE_CLASS_MEASUREMENT,
     )({
-        CONF_ID: cg.allocate_id(sensor.Sensor),
+        cv.GenerateID("enermon_voltage"): cv.declare_id(sensor.Sensor),
         CONF_NAME: "Mains Voltage",
     })
 
@@ -164,7 +164,7 @@ async def to_code(config):
         device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
         state_class=STATE_CLASS_MEASUREMENT,
     )({
-        CONF_ID: cg.allocate_id(sensor.Sensor),
+        cv.GenerateID("enermon_wifi_rssi"): cv.declare_id(sensor.Sensor),
         CONF_NAME: "WiFi RSSI",
     })
 
