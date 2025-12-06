@@ -33,12 +33,8 @@ class Enermon : public Component {
 
  protected:
   std::vector<int> ct_pins_;
-  std::vector<float> a_per_v_;
-  std::vector<float> cal_gain_;
-  std::vector<float> cal_offset_;
   std::vector<float> ct_cal_;
   int voltage_pin_;
-  float voltage_divider_;
   float voltage_cal_;
   int voltage_phase_;
   unsigned int sample_count_;
