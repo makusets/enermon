@@ -39,6 +39,30 @@ void Enermon::set_voltage_config(int voltage_pin,
   }
 }
 
+void Enermon::set_sensor_current(int index, esphome::sensor::Sensor *sensor) {
+  if (index < 0 || index >= 4) return;
+  sensor_current_rms[index] = sensor;
+}
+void Enermon::set_sensor_power(int index, esphome::sensor::Sensor *sensor) {
+  if (index < 0 || index >= 4) return;
+  sensor_power_w[index] = sensor;
+}
+void Enermon::set_sensor_energy_daily(int index, esphome::sensor::Sensor *sensor) {
+  if (index < 0 || index >= 4) return;
+  sensor_energy_daily_wh[index] = sensor;
+}
+void Enermon::set_sensor_energy_weekly(int index, esphome::sensor::Sensor *sensor) {
+  if (index < 0 || index >= 4) return;
+  sensor_energy_weekly_wh[index] = sensor;
+}
+void Enermon::set_sensor_energy_monthly(int index, esphome::sensor::Sensor *sensor) {
+  if (index < 0 || index >= 4) return;
+  sensor_energy_monthly_wh[index] = sensor;
+}
+void Enermon::set_sensor_voltage(esphome::sensor::Sensor *sensor) { sensor_voltage_rms = sensor; }
+void Enermon::set_sensor_wifi_rssi(esphome::sensor::Sensor *sensor) { sensor_wifi_rssi = sensor; }
+
+
 void Enermon::setup() {
   for (int i = 0; i < 4; ++i) {
     char name_buf[32];

@@ -16,6 +16,14 @@ class Enermon : public Component {
                           float voltage_cal,
                           float voltage_phase,
                           unsigned int sample_count);
+    // Sensor wiring from Python codegen
+  void set_sensor_current(int index, esphome::sensor::Sensor *sensor);
+  void set_sensor_power(int index, esphome::sensor::Sensor *sensor);
+  void set_sensor_energy_daily(int index, esphome::sensor::Sensor *sensor);
+  void set_sensor_energy_weekly(int index, esphome::sensor::Sensor *sensor);
+  void set_sensor_energy_monthly(int index, esphome::sensor::Sensor *sensor);
+  void set_sensor_voltage(esphome::sensor::Sensor *sensor);
+  void set_sensor_wifi_rssi(esphome::sensor::Sensor *sensor);
 
   void setup() override;
   void loop() override;
