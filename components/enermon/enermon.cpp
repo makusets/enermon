@@ -22,9 +22,6 @@ Enermon::Enermon(const std::vector<int> &ct_pins,
       sample_count_(sample_count),
       last_sample_time_ms_(0) {
   ct_pins_.resize(4, -1);
-  a_per_v_.resize(4, 0.0f);
-  cal_gain_.resize(4, 1.0f);
-  cal_offset_.resize(4, 0.0f);
   ct_cal_.resize(4, 1111.0f);
   for (int i = 0; i < 4; ++i) {
     last_irms_[i] = 0.0f;
