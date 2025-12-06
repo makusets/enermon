@@ -4,27 +4,27 @@
 namespace esphome {
 namespace enermon {
 
-Enermon::Enermon(const std::vector<int> &ct_pins,
-                 const std::vector<float> &ct_cal,
-                 int voltage_pin,
-                 float voltage_divider,
-                 float voltage_cal,
-                 float voltage_phase,
-                 unsigned int sample_count)
-    : ct_pins_(ct_pins),
-      ct_cal_(ct_cal),
-      voltage_pin_(voltage_pin),
-      voltage_cal_(voltage_cal),
-      voltage_phase_(voltage_phase),
-      sample_count_(sample_count),
-      last_sample_time_ms_(0) {
+void Enermon::set_config(const std::vector<int> &ct_pins,
+                         const std::vector<float> &ct_cal,
+                         int voltage_pin,
+                         float voltage_cal,
+                         float voltage_phase,
+                         unsigned int sample_count) {
+  ct_pins_      = ct_pins;
+  ct_cal_       = ct_cal;
+  voltage_pin_  = voltage_pin;
+  voltage_cal_  = voltage_cal;
+  voltage_phase_= voltage_phase;
+  sample_count_ = sample_count;
+
   ct_pins_.resize(4, -1);
   ct_cal_.resize(4, 1111.0f);
+
   for (int i = 0; i < 4; ++i) {
-    last_irms_[i] = 0.0f;
-    energy_daily_wh_[i] = 0.0;
-    energy_weekly_wh_[i] = 0.0;
-    energy_monthly_wh_[i] = 0.0;
+    last_irms_[i]           = 0.0f;
+    energy_daily_wh_[i]     = 0.0;
+    energy_weekly_wh_[i]    = 0.0;
+    energy_monthly_wh_[i]   = 0.0;
   }
 }
 

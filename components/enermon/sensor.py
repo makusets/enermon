@@ -45,10 +45,15 @@ async def to_code(config):
     ct_pins = config.get(CONF_CT_PINS, [])
     ct_cal = config.get(CONF_CT_CAL, [])
     voltage_pin = config.get(CONF_VOLTAGE_PIN, -1)
-    voltage_cal = config.get(CONF_VOLTAGE_CAL, 23426.0)
-    voltage_phase = config.get(CONF_VOLTAGE_PHASE, 0)
+    voltage_cal = config.get(CONF_VOLTAGE_CAL, 230.0)
+    voltage_phase = config.get(CONF_VOLTAGE_PHASE, 1.7)
     sample_count = config.get(CONF_SAMPLE_COUNT, 200)
 
+    # Create the component instance (no ctor args)
+    var = cg.new_Pvariable(config[CONF_ID])
+    await cg.register_component(var, config)
+
+    # Build std::vector<int> and std::vector<float>
     int_vector = cg.std_vector(cg.int_)
     float_vector = cg.std_vector(cg.float_)
 
@@ -60,5 +65,7 @@ async def to_code(config):
     for cc in ct_cal:
         c_ct_cal.push_back(cc)
 
-    var = cg.new_Pvariable(config[CONF_ID], c_ct_pins, c_ct_cal, voltage_pin, voltage_cal, voltage_phase, sample_count)
-    cg.add(var)
+    # Call the C++ setter with properly ordered arguments
+    cg.add(var.set_config(c_ct_pins, c_ct_cal,
+                          voltage_pin, voltage_cal,
+                          voltage_phase, sample_count))
