@@ -1,6 +1,6 @@
 #include "enermon.h"
 #include <time.h>
-#include <cstdio.h>
+#include <stdio.h>
 
 namespace esphome {
 namespace enermon {
