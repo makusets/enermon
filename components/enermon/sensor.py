@@ -16,7 +16,7 @@ from esphome.const import (
     UNIT_DECIBEL_MILLIWATT,
     UNIT_VOLT,
     UNIT_WATT,
-    )
+)
 
 cg.add_library(
     name="EmonLib",
@@ -85,51 +85,46 @@ async def to_code(config):
     for i, pin in enumerate(ct_pins):
         base_name = ct_names[i] if i < len(ct_names) else f"CT{i}"
 
-        current = await sensor.new_sensor(
-            {
-                CONF_NAME: f"{base_name} Current",
-                "unit_of_measurement": UNIT_AMPERE,
-                "accuracy_decimals": 2,
-                "device_class": DEVICE_CLASS_CURRENT,
-                "state_class": STATE_CLASS_MEASUREMENT,
-            }
-        )
-        power = await sensor.new_sensor(
-            {
-                CONF_NAME: f"{base_name} Power",
-                "unit_of_measurement": UNIT_WATT,
-                "accuracy_decimals": 1,
-                "device_class": DEVICE_CLASS_POWER,
-                "state_class": STATE_CLASS_MEASUREMENT,
-            }
-        )
-        energy_day = await sensor.new_sensor(
-            {
-                CONF_NAME: f"{base_name} Energy Daily",
-                "unit_of_measurement": "Wh",
-                "accuracy_decimals": 1,
-                "device_class": DEVICE_CLASS_ENERGY,
-                "state_class": STATE_CLASS_TOTAL_INCREASING,
-            }
-        )
-        energy_week = await sensor.new_sensor(
-            {
-                CONF_NAME: f"{base_name} Energy Weekly",
-                "unit_of_measurement": "Wh",
-                "accuracy_decimals": 1,
-                "device_class": DEVICE_CLASS_ENERGY,
-                "state_class": STATE_CLASS_TOTAL_INCREASING,
-            }
-        )
-        energy_month = await sensor.new_sensor(
-            {
-                CONF_NAME: f"{base_name} Energy Monthly",
-                "unit_of_measurement": "Wh",
-                "accuracy_decimals": 1,
-                "device_class": DEVICE_CLASS_ENERGY,
-                "state_class": STATE_CLASS_TOTAL_INCREASING,
-            }
-        )
+        current_conf = sensor.sensor_schema(
+            unit_of_measurement=UNIT_AMPERE,
+            accuracy_decimals=2,
+            device_class=DEVICE_CLASS_CURRENT,
+            state_class=STATE_CLASS_MEASUREMENT,
+        ).schema({CONF_NAME: f"{base_name} Current"})
+
+        power_conf = sensor.sensor_schema(
+            unit_of_measurement=UNIT_WATT,
+            accuracy_decimals=1,
+            device_class=DEVICE_CLASS_POWER,
+            state_class=STATE_CLASS_MEASUREMENT,
+        ).schema({CONF_NAME: f"{base_name} Power"})
+
+        energy_day_conf = sensor.sensor_schema(
+            unit_of_measurement="Wh",
+            accuracy_decimals=1,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
+        ).schema({CONF_NAME: f"{base_name} Energy Daily"})
+
+        energy_week_conf = sensor.sensor_schema(
+            unit_of_measurement="Wh",
+            accuracy_decimals=1,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
+        ).schema({CONF_NAME: f"{base_name} Energy Weekly"})
+
+        energy_month_conf = sensor.sensor_schema(
+            unit_of_measurement="Wh",
+            accuracy_decimals=1,
+            device_class=DEVICE_CLASS_ENERGY,
+            state_class=STATE_CLASS_TOTAL_INCREASING,
+        ).schema({CONF_NAME: f"{base_name} Energy Monthly"})
+
+        current = await sensor.new_sensor(current_conf)
+        power = await sensor.new_sensor(power_conf)
+        energy_day = await sensor.new_sensor(energy_day_conf)
+        energy_week = await sensor.new_sensor(energy_week_conf)
+        energy_month = await sensor.new_sensor(energy_month_conf)
 
         cg.add(var.set_sensor_current(i, current))
         cg.add(var.set_sensor_power(i, power))
@@ -138,23 +133,22 @@ async def to_code(config):
         cg.add(var.set_sensor_energy_monthly(i, energy_month))
 
     # Voltage and WiFi sensors
-    voltage_sensor = await sensor.new_sensor(
-        {
-            CONF_NAME: "Mains Voltage",
-            "unit_of_measurement": UNIT_VOLT,
-            "accuracy_decimals": 1,
-            "device_class": DEVICE_CLASS_VOLTAGE,
-            "state_class": STATE_CLASS_MEASUREMENT,
-        }
-    )
-    wifi_rssi = await sensor.new_sensor(
-        {
-            CONF_NAME: "WiFi RSSI",
-            "unit_of_measurement": UNIT_DECIBEL_MILLIWATT,
-            "accuracy_decimals": 0,
-            "device_class": DEVICE_CLASS_SIGNAL_STRENGTH,
-            "state_class": STATE_CLASS_MEASUREMENT,
-        }
-    )
+    voltage_conf = sensor.sensor_schema(
+        unit_of_measurement=UNIT_VOLT,
+        accuracy_decimals=1,
+        device_class=DEVICE_CLASS_VOLTAGE,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ).schema({CONF_NAME: "Mains Voltage"})
+
+    wifi_conf = sensor.sensor_schema(
+        unit_of_measurement=UNIT_DECIBEL_MILLIWATT,
+        accuracy_decimals=0,
+        device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
+        state_class=STATE_CLASS_MEASUREMENT,
+    ).schema({CONF_NAME: "WiFi RSSI"})
+
+    voltage_sensor = await sensor.new_sensor(voltage_conf)
+    wifi_rssi = await sensor.new_sensor(wifi_conf)
+
     cg.add(var.set_sensor_voltage(voltage_sensor))
     cg.add(var.set_sensor_wifi_rssi(wifi_rssi))
