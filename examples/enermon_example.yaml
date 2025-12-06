@@ -20,15 +20,12 @@ ota:
 sensor:
   - platform: enermon
     id: enermon_sensor
-    ct_names: ["solar","ac","grid","load"]
+    ct_names: ["grid","ev","solar","ac"]
     ct_pins: [34,35,32,33]
-    ct_cal: [1111.0, 1111.0, 1111.0, 1111.0]     # tune per CT with known load
+    ct_cal: [30.0, 30.0, 30.0, 20.0]     # tune per CT with known load
     voltage_pin: 39
     voltage_cal: 230.0
-    voltage_phase: 1.7
+    voltage_phase: 1.0
     sample_count: 200
 
 
-
-status_led:
-  pin: GPIO2

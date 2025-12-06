@@ -1,5 +1,6 @@
 #include "enermon.h"
 #include <time.h>
+#include <cstdio.h>
 
 namespace esphome {
 namespace enermon {
@@ -40,14 +41,41 @@ void Enermon::set_voltage_config(int voltage_pin,
 
 void Enermon::setup() {
   for (int i = 0; i < 4; ++i) {
-    if (!sensor_current_rms[i]) sensor_current_rms[i] = new esphome::sensor::Sensor();
-    if (!sensor_power_w[i]) sensor_power_w[i] = new esphome::sensor::Sensor();
-    if (!sensor_energy_daily_wh[i]) sensor_energy_daily_wh[i] = new esphome::sensor::Sensor();
-    if (!sensor_energy_weekly_wh[i]) sensor_energy_weekly_wh[i] = new esphome::sensor::Sensor();
-    if (!sensor_energy_monthly_wh[i]) sensor_energy_monthly_wh[i] = new esphome::sensor::Sensor();
+    char name_buf[32];
+    if (!sensor_current_rms[i]) {
+      sensor_current_rms[i] = new esphome::sensor::Sensor();
+      snprintf(name_buf, sizeof(name_buf), "CT%d Current", i);
+      sensor_current_rms[i]->set_name(name_buf);
+    }
+    if (!sensor_power_w[i]) {
+      sensor_power_w[i] = new esphome::sensor::Sensor();
+      snprintf(name_buf, sizeof(name_buf), "CT%d Power", i);
+      sensor_power_w[i]->set_name(name_buf);
+    }
+    if (!sensor_energy_daily_wh[i]) {
+      sensor_energy_daily_wh[i] = new esphome::sensor::Sensor();
+      snprintf(name_buf, sizeof(name_buf), "CT%d Energy Daily", i);
+      sensor_energy_daily_wh[i]->set_name(name_buf);
+    }
+    if (!sensor_energy_weekly_wh[i]) {
+      sensor_energy_weekly_wh[i] = new esphome::sensor::Sensor();
+      snprintf(name_buf, sizeof(name_buf), "CT%d Energy Weekly", i);
+      sensor_energy_weekly_wh[i]->set_name(name_buf);
+    }
+    if (!sensor_energy_monthly_wh[i]) {
+      sensor_energy_monthly_wh[i] = new esphome::sensor::Sensor();
+      snprintf(name_buf, sizeof(name_buf), "CT%d Energy Monthly", i);
+      sensor_energy_monthly_wh[i]->set_name(name_buf);
+    }
   }
-  if (!sensor_voltage_rms) sensor_voltage_rms = new esphome::sensor::Sensor();
-  if (!sensor_wifi_rssi) sensor_wifi_rssi = new esphome::sensor::Sensor();
+  if (!sensor_voltage_rms) {
+    sensor_voltage_rms = new esphome::sensor::Sensor();
+    sensor_voltage_rms->set_name("Mains Voltage");
+  }
+  if (!sensor_wifi_rssi) {
+    sensor_wifi_rssi = new esphome::sensor::Sensor();
+    sensor_wifi_rssi->set_name("WiFi RSSI");
+  }
 
   // Configure EmonLib instances: current per CT, same voltage pin/cal/phase for all
   for (int i = 0; i < 4; ++i) {
