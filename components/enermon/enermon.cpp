@@ -4,7 +4,6 @@
 namespace esphome {
 namespace enermon {
 
-Enermon::Enermon() = default;
 
 void Enermon::add_ct_channel(int index, int ct_pin, float ct_cal) {
   if (index < 0) return;
