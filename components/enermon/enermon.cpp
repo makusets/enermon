@@ -5,14 +5,11 @@ namespace esphome {
 namespace enermon {
 
 Enermon::Enermon(const std::vector<int> &ct_pins,
-                 const std::vector<float> &a_per_v,
-                 const std::vector<float> &cal_gain,
-                 const std::vector<float> &cal_offset,
                  const std::vector<float> &ct_cal,
                  int voltage_pin,
                  float voltage_divider,
                  float voltage_cal,
-                 int voltage_phase,
+                 float voltage_phase,
                  unsigned int sample_count)
     : ct_pins_(ct_pins),
       ct_cal_(ct_cal),

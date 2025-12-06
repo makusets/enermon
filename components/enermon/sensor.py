@@ -32,8 +32,8 @@ CONFIG_SCHEMA = (
             cv.Optional(CONF_CT_CAL, default=[]): cv.ensure_list(cv.float_),
             cv.Optional(CONF_CT_NAMES, default=[]): cv.ensure_list(cv.string),
             cv.Optional(CONF_VOLTAGE_PIN, default=None): cv.int_,
-            cv.Optional(CONF_VOLTAGE_CAL, default=23426.0): cv.float_,
-            cv.Optional(CONF_VOLTAGE_PHASE, default=0): cv.int_,
+            cv.Optional(CONF_VOLTAGE_CAL, default=230.0): cv.float_,
+            cv.Optional(CONF_VOLTAGE_PHASE, default=1.7): cv.float_,
             cv.Optional(CONF_SAMPLE_COUNT, default=200): cv.positive_int,
         }
     )

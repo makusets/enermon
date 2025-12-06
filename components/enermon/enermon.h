@@ -10,14 +10,11 @@ namespace enermon {
 class Enermon : public Component {
  public:
   Enermon(const std::vector<int> &ct_pins,
-          const std::vector<float> &a_per_v,
-          const std::vector<float> &cal_gain,
-          const std::vector<float> &cal_offset,
           const std::vector<float> &ct_cal,
           int voltage_pin,
           float voltage_divider = 80.0,
-          float voltage_cal = 23426.0,
-          int voltage_phase = 0,
+          float voltage_cal = 230.0,
+          float voltage_phase = 0.0,
           unsigned int sample_count = 200);
 
   void setup() override;
@@ -36,7 +33,7 @@ class Enermon : public Component {
   std::vector<float> ct_cal_;
   int voltage_pin_;
   float voltage_cal_;
-  int voltage_phase_;
+  float voltage_phase_;
   unsigned int sample_count_;
 
   unsigned long last_sample_time_ms_;
