@@ -12,7 +12,7 @@ void Enermon::add_ct_channel(int index, int ct_pin, float ct_cal) {
   if (ct_pins_.size() < static_cast<size_t>(index + 1))
     ct_pins_.resize(index + 1, -1);
   if (ct_cal_.size() < static_cast<size_t>(index + 1))
-    ct_cal_.resize(index + 1, 1111.0f);
+    ct_cal_.resize(index + 1, 30.0f);
 
   ct_pins_[index] = ct_pin;
   ct_cal_[index] = ct_cal;

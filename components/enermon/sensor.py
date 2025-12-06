@@ -69,7 +69,7 @@ async def to_code(config):
 
     # Configure CT channels
     for i, pin in enumerate(ct_pins):
-        cal = ct_cal[i] if i < len(ct_cal) else 1111.0
+        cal = ct_cal[i] if i < len(ct_cal) else 30.0
         cg.add(var.add_ct_channel(i, pin, cal))
 
     # Voltage config
