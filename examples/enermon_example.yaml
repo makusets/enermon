@@ -127,7 +127,12 @@ enermon:
 
 # Alternative filter options you can use:
 #
-# filters:
+# For rounding to different intervals:
+#   - lambda: return int(x / 10.0 + 0.5) * 10.0;   # Round to nearest 10W
+#   - lambda: return int(x / 25.0 + 0.5) * 25.0;   # Round to nearest 25W
+#   - lambda: return int(x / 100.0 + 0.5) * 100.0; # Round to nearest 100W
+#
+# Other useful filters:
 #   - throttle: 30s           # Only send updates every 30 seconds
 #   - heartbeat: 60s          # Send at least one update every 60s even if unchanged
 #   - delta: 0.1              # Only send if value changes by 0.1 or more
