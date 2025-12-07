@@ -80,15 +80,18 @@ async def to_code(config):
         )
     )
 
-    # Auto-create per-CT sensors so they are exposed to HA without YAML declarations
+    # Auto-create per-CT sensors with unique IDs
     for i, pin in enumerate(ct_pins):
         base_name = ct_names[i] if i < len(ct_names) else f"CT{i}"
+        base_id = base_name.lower().replace(" ", "_")
 
         current_conf = sensor.sensor_schema(
             unit_of_measurement=UNIT_AMPERE,
             accuracy_decimals=2,
             device_class=DEVICE_CLASS_CURRENT,
             state_class=STATE_CLASS_MEASUREMENT,
+        ).extend(
+            {cv.GenerateID(f"{base_id}_current"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Current",
         })
@@ -98,6 +101,8 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_POWER,
             state_class=STATE_CLASS_MEASUREMENT,
+        ).extend(
+            {cv.GenerateID(f"{base_id}_power"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Power",
         })
@@ -107,6 +112,8 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+        ).extend(
+            {cv.GenerateID(f"{base_id}_energy_daily"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Energy Daily",
         })
@@ -116,6 +123,8 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+        ).extend(
+            {cv.GenerateID(f"{base_id}_energy_weekly"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Energy Weekly",
         })
@@ -125,6 +134,8 @@ async def to_code(config):
             accuracy_decimals=1,
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
+        ).extend(
+            {cv.GenerateID(f"{base_id}_energy_monthly"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Energy Monthly",
         })
@@ -141,12 +152,14 @@ async def to_code(config):
         cg.add(var.set_sensor_energy_weekly(i, energy_week))
         cg.add(var.set_sensor_energy_monthly(i, energy_month))
 
-    # Voltage and WiFi sensors
+    # Voltage and WiFi sensors with fixed unique IDs
     voltage_conf = sensor.sensor_schema(
         unit_of_measurement=UNIT_VOLT,
         accuracy_decimals=1,
         device_class=DEVICE_CLASS_VOLTAGE,
         state_class=STATE_CLASS_MEASUREMENT,
+    ).extend(
+        {cv.GenerateID("enermon_voltage"): cv.declare_id(sensor.Sensor)}
     )({
         CONF_NAME: "Mains Voltage",
     })
@@ -156,6 +169,8 @@ async def to_code(config):
         accuracy_decimals=0,
         device_class=DEVICE_CLASS_SIGNAL_STRENGTH,
         state_class=STATE_CLASS_MEASUREMENT,
+    ).extend(
+        {cv.GenerateID("enermon_wifi_rssi"): cv.declare_id(sensor.Sensor)}
     )({
         CONF_NAME: "WiFi RSSI",
     })
