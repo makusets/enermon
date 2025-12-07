@@ -80,10 +80,9 @@ async def to_code(config):
         )
     )
 
-    # Auto-create per-CT sensors with unique IDs
+    # Auto-create per-CT sensors so they are exposed to HA without YAML declarations
     for i, pin in enumerate(ct_pins):
         base_name = ct_names[i] if i < len(ct_names) else f"CT{i}"
-        base_id = base_name.lower().replace(" ", "_")
 
         current_conf = sensor.sensor_schema(
             unit_of_measurement=UNIT_AMPERE,
@@ -91,7 +90,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_CURRENT,
             state_class=STATE_CLASS_MEASUREMENT,
         ).extend(
-            {cv.GenerateID(f"{base_id}_current"): cv.declare_id(sensor.Sensor)}
+            {cv.GenerateID(f"enermon_current_{i}"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Current",
         })
@@ -102,7 +101,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_POWER,
             state_class=STATE_CLASS_MEASUREMENT,
         ).extend(
-            {cv.GenerateID(f"{base_id}_power"): cv.declare_id(sensor.Sensor)}
+            {cv.GenerateID(f"enermon_power_{i}"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Power",
         })
@@ -113,7 +112,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ).extend(
-            {cv.GenerateID(f"{base_id}_energy_daily"): cv.declare_id(sensor.Sensor)}
+            {cv.GenerateID(f"enermon_energy_daily_{i}"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Energy Daily",
         })
@@ -124,7 +123,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ).extend(
-            {cv.GenerateID(f"{base_id}_energy_weekly"): cv.declare_id(sensor.Sensor)}
+            {cv.GenerateID(f"enermon_energy_weekly_{i}"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Energy Weekly",
         })
@@ -135,7 +134,7 @@ async def to_code(config):
             device_class=DEVICE_CLASS_ENERGY,
             state_class=STATE_CLASS_TOTAL_INCREASING,
         ).extend(
-            {cv.GenerateID(f"{base_id}_energy_monthly"): cv.declare_id(sensor.Sensor)}
+            {cv.GenerateID(f"enermon_energy_monthly_{i}"): cv.declare_id(sensor.Sensor)}
         )({
             CONF_NAME: f"{base_name} Energy Monthly",
         })
