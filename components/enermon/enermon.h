@@ -10,7 +10,7 @@ namespace enermon {
 
 class Enermon : public Component {
  public:
-  Enermon() = default;  // simple default constructor
+  Enermon() = default;
 
   void add_ct_channel(int index, int ct_pin, float ct_cal);
   void set_voltage_config(int voltage_pin,
@@ -27,6 +27,7 @@ class Enermon : public Component {
 
   void setup() override;
   void loop() override;
+  void update();
   void dump_config() override;
   float get_setup_priority() const override { return setup_priority::DATA; }
 
@@ -45,8 +46,8 @@ class Enermon : public Component {
   float voltage_phase_{0.0f};
   unsigned int sample_count_{200};
 
-  unsigned long last_sample_time_ms_;
-  unsigned long last_save_time_ms_{0};
+  unsigned long last_update_ms_{0};
+  unsigned long last_save_ms_{0};
 
   // EmonLib instances (one per CT)
   std::array<EnergyMonitor, 4> emon_ct_;
