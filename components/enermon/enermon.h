@@ -1,5 +1,6 @@
 #pragma once
 #include "esphome.h"
+#include "esphome/core/preferences.h"
 #include "EmonLib.h"
 #include <vector>
 #include <array>
@@ -23,10 +24,11 @@ class Enermon : public Component {
   void set_sensor_energy_weekly(int index, esphome::sensor::Sensor *sensor);
   void set_sensor_energy_monthly(int index, esphome::sensor::Sensor *sensor);
   void set_sensor_voltage(esphome::sensor::Sensor *sensor);
-  void set_sensor_wifi_rssi(esphome::sensor::Sensor *sensor);
 
   void setup() override;
   void loop() override;
+  void dump_config() override;
+  float get_setup_priority() const override { return setup_priority::DATA; }
 
   std::array<esphome::sensor::Sensor*, 4> sensor_current_rms{};
   std::array<esphome::sensor::Sensor*, 4> sensor_power_w{};  // signed active power (W)
@@ -34,7 +36,6 @@ class Enermon : public Component {
   std::array<esphome::sensor::Sensor*, 4> sensor_energy_weekly_wh{};
   std::array<esphome::sensor::Sensor*, 4> sensor_energy_monthly_wh{};
   esphome::sensor::Sensor *sensor_voltage_rms{nullptr};
-  esphome::sensor::Sensor *sensor_wifi_rssi{nullptr};
 
  protected:
   std::vector<int> ct_pins_;
@@ -45,6 +46,7 @@ class Enermon : public Component {
   unsigned int sample_count_{200};
 
   unsigned long last_sample_time_ms_;
+  unsigned long last_save_time_ms_{0};
 
   // EmonLib instances (one per CT)
   std::array<EnergyMonitor, 4> emon_ct_;
@@ -61,7 +63,15 @@ class Enermon : public Component {
   time_t last_week_reset_{0};
   time_t last_month_reset_{0};
 
+  // Preferences for persistent storage
+  ESPPreferenceObject pref_daily_;
+  ESPPreferenceObject pref_weekly_;
+  ESPPreferenceObject pref_monthly_;
+  ESPPreferenceObject pref_reset_times_;
+
   void maybe_reset_counters_();
+  void save_energy_counters_();
+  void load_energy_counters_();
 };
 
 }  // namespace enermon

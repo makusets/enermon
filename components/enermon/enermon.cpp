@@ -60,10 +60,24 @@ void Enermon::set_sensor_energy_monthly(int index, esphome::sensor::Sensor *sens
   sensor_energy_monthly_wh[index] = sensor;
 }
 void Enermon::set_sensor_voltage(esphome::sensor::Sensor *sensor) { sensor_voltage_rms = sensor; }
-void Enermon::set_sensor_wifi_rssi(esphome::sensor::Sensor *sensor) { sensor_wifi_rssi = sensor; }
 
 
 void Enermon::setup() {
+  // Initialize preferences for persistent storage
+  pref_daily_ = global_preferences->make_preference<std::array<double, 4>>(fnv1_hash("enermon_daily"));
+  pref_weekly_ = global_preferences->make_preference<std::array<double, 4>>(fnv1_hash("enermon_weekly"));
+  pref_monthly_ = global_preferences->make_preference<std::array<double, 4>>(fnv1_hash("enermon_monthly"));
+  
+  struct ResetTimes {
+    time_t day;
+    time_t week;
+    time_t month;
+  };
+  pref_reset_times_ = global_preferences->make_preference<ResetTimes>(fnv1_hash("enermon_resets"));
+
+  // Load saved energy counters
+  load_energy_counters_();
+
   for (int i = 0; i < 4; ++i) {
     char name_buf[32];
     if (!sensor_current_rms[i]) {
@@ -89,16 +103,12 @@ void Enermon::setup() {
     if (!sensor_energy_monthly_wh[i]) {
       sensor_energy_monthly_wh[i] = new esphome::sensor::Sensor();
       snprintf(name_buf, sizeof(name_buf), "CT%d Energy Monthly", i);
-      sensor_energy_monthly_wh[i]->set_name(name_buf);
+      energy_monthly_wh[i]->set_name(name_buf);
     }
   }
   if (!sensor_voltage_rms) {
     sensor_voltage_rms = new esphome::sensor::Sensor();
     sensor_voltage_rms->set_name("Mains Voltage");
-  }
-  if (!sensor_wifi_rssi) {
-    sensor_wifi_rssi = new esphome::sensor::Sensor();
-    sensor_wifi_rssi->set_name("WiFi RSSI");
   }
 
   // Configure EmonLib instances: current per CT, same voltage pin/cal/phase for all
@@ -113,10 +123,11 @@ void Enermon::setup() {
 
   last_sample_time_ms_ = millis();
 
+  // Only set initial reset times if not loaded from preferences
   time_t now = time(nullptr);
-  last_day_reset_ = now;
-  last_week_reset_ = now;
-  last_month_reset_ = now;
+  if (last_day_reset_ == 0) last_day_reset_ = now;
+  if (last_week_reset_ == 0) last_week_reset_ = now;
+  if (last_month_reset_ == 0) last_month_reset_ = now;
 }
 
 void Enermon::maybe_reset_counters_() {
@@ -125,9 +136,12 @@ void Enermon::maybe_reset_counters_() {
   struct tm *tm_now = localtime(&now);
   struct tm *tm_last = localtime(&last_day_reset_);
 
+  bool changed = false;
+
   if (tm_now->tm_yday != tm_last->tm_yday || tm_now->tm_year != tm_last->tm_year) {
     for (int i = 0; i < 4; ++i) energy_daily_wh_[i] = 0.0;
     last_day_reset_ = now;
+    changed = true;
   }
 
   int week_now = (tm_now->tm_yday / 7) + tm_now->tm_year * 52;
@@ -135,11 +149,18 @@ void Enermon::maybe_reset_counters_() {
   if (week_now != week_last) {
     for (int i = 0; i < 4; ++i) energy_weekly_wh_[i] = 0.0;
     last_week_reset_ = now;
+    changed = true;
   }
 
   if (tm_now->tm_mon != tm_last->tm_mon || tm_now->tm_year != tm_last->tm_year) {
     for (int i = 0; i < 4; ++i) energy_monthly_wh_[i] = 0.0;
     last_month_reset_ = now;
+    changed = true;
+  }
+
+  // Save counters if they were reset
+  if (changed) {
+    save_energy_counters_();
   }
 }
 
@@ -150,6 +171,8 @@ void Enermon::loop() {
   last_sample_time_ms_ = now_ms;
 
   double elapsed_h = sample_interval / 1000.0 / 3600.0;
+
+  bool energy_changed = false;
 
   for (int i = 0; i < 4; ++i) {
     if (ct_pins_[i] < 0) continue;
@@ -171,14 +194,72 @@ void Enermon::loop() {
     energy_daily_wh_[i] += wh;
     energy_weekly_wh_[i] += wh;
     energy_monthly_wh_[i] += wh;
+    energy_changed = true;
 
     if (sensor_energy_daily_wh[i]) sensor_energy_daily_wh[i]->publish_state(energy_daily_wh_[i]);
     if (sensor_energy_weekly_wh[i]) sensor_energy_weekly_wh[i]->publish_state(energy_weekly_wh_[i]);
     if (sensor_energy_monthly_wh[i]) sensor_energy_monthly_wh[i]->publish_state(energy_monthly_wh_[i]);
   }
 
-  if (sensor_wifi_rssi) sensor_wifi_rssi->publish_state(WiFi.RSSI());
+  // Save energy counters every 5 minutes to reduce flash wear
+  const unsigned long save_interval = 300000;  // 5 minutes in ms
+  if (energy_changed && (now_ms - last_save_time_ms_ >= save_interval)) {
+    save_energy_counters_();
+    last_save_time_ms_ = now_ms;
+  }
+
   maybe_reset_counters_();
+}
+
+void Enermon::save_energy_counters_() {
+  pref_daily_.save(&energy_daily_wh_);
+  pref_weekly_.save(&energy_weekly_wh_);
+  pref_monthly_.save(&energy_monthly_wh_);
+  
+  struct ResetTimes {
+    time_t day;
+    time_t week;
+    time_t month;
+  };
+  ResetTimes times = {last_day_reset_, last_week_reset_, last_month_reset_};
+  pref_reset_times_.save(&times);
+}
+
+void Enermon::load_energy_counters_() {
+  std::array<double, 4> daily, weekly, monthly;
+  
+  if (pref_daily_.load(&daily)) {
+    energy_daily_wh_ = daily;
+  }
+  if (pref_weekly_.load(&weekly)) {
+    energy_weekly_wh_ = weekly;
+  }
+  if (pref_monthly_.load(&monthly)) {
+    energy_monthly_wh_ = monthly;
+  }
+  
+  struct ResetTimes {
+    time_t day;
+    time_t week;
+    time_t month;
+  };
+  ResetTimes times;
+  if (pref_reset_times_.load(&times)) {
+    last_day_reset_ = times.day;
+    last_week_reset_ = times.week;
+    last_month_reset_ = times.month;
+  }
+}
+
+void Enermon::dump_config() {
+  ESP_LOGCONFIG("enermon", "Enermon Energy Monitor:");
+  ESP_LOGCONFIG("enermon", "  Voltage Pin: %d", voltage_pin_);
+  ESP_LOGCONFIG("enermon", "  Voltage Cal: %.1f", voltage_cal_);
+  for (size_t i = 0; i < ct_pins_.size(); ++i) {
+    if (ct_pins_[i] >= 0) {
+      ESP_LOGCONFIG("enermon", "  CT%d Pin: %d, Cal: %.1f", i, ct_pins_[i], ct_cal_[i]);
+    }
+  }
 }
 
 }  // namespace enermon
