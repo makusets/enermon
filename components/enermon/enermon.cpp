@@ -103,7 +103,7 @@ void Enermon::setup() {
     if (!sensor_energy_monthly_wh[i]) {
       sensor_energy_monthly_wh[i] = new esphome::sensor::Sensor();
       snprintf(name_buf, sizeof(name_buf), "CT%d Energy Monthly", i);
-      energy_monthly_wh[i]->set_name(name_buf);
+      sensor_energy_monthly_wh[i]->set_name(name_buf);
     }
   }
   if (!sensor_voltage_rms) {
@@ -121,17 +121,17 @@ void Enermon::setup() {
     }
   }
 
-  last_sample_time_ms_ = millis();
+  last_update_ms_ = millis();
 
   // Only set initial reset times if not loaded from preferences
-  time_t now = time(nullptr);
+  time_t now = ::time(nullptr);
   if (last_day_reset_ == 0) last_day_reset_ = now;
   if (last_week_reset_ == 0) last_week_reset_ = now;
   if (last_month_reset_ == 0) last_month_reset_ = now;
 }
 
 void Enermon::maybe_reset_counters_() {
-  time_t now = time(nullptr);
+  time_t now = ::time(nullptr);
   if (now == ((time_t) 0)) return;
   struct tm *tm_now = localtime(&now);
   struct tm *tm_last = localtime(&last_day_reset_);
@@ -164,15 +164,17 @@ void Enermon::maybe_reset_counters_() {
   }
 }
 
-void Enermon::loop() {
+void Enermon::update() {
   unsigned long now_ms = millis();
-  const unsigned long sample_interval = 200;  // ms between publishes
-  if (now_ms - last_sample_time_ms_ < sample_interval) return;
-  last_sample_time_ms_ = now_ms;
-
-  double elapsed_h = sample_interval / 1000.0 / 3600.0;
-
-  bool energy_changed = false;
+  
+  // Calculate time elapsed since last update (in hours)
+  if (last_update_ms_ == 0) {
+    last_update_ms_ = now_ms;
+    return;  // Skip first update to establish baseline
+  }
+  
+  double elapsed_h = (now_ms - last_update_ms_) / 1000.0 / 3600.0;
+  last_update_ms_ = now_ms;
 
   for (int i = 0; i < 4; ++i) {
     if (ct_pins_[i] < 0) continue;
@@ -180,7 +182,7 @@ void Enermon::loop() {
     emon_ct_[i].calcVI(20, sample_count_);
     float irms = float(emon_ct_[i].Irms);
     float vrms = float(emon_ct_[i].Vrms);
-    float real_p = float(emon_ct_[i].realPower);  // signed active power (W)
+    float real_p = float(emon_ct_[i].realPower);
 
     last_irms_[i] = irms;
     if (sensor_current_rms[i]) sensor_current_rms[i]->publish_state(irms);
@@ -190,11 +192,11 @@ void Enermon::loop() {
     last_vrms_ = vrms;
     if (sensor_voltage_rms) sensor_voltage_rms->publish_state(vrms);
 
+    // Accumulate energy based on actual elapsed time
     double wh = real_p * elapsed_h;
     energy_daily_wh_[i] += wh;
     energy_weekly_wh_[i] += wh;
     energy_monthly_wh_[i] += wh;
-    energy_changed = true;
 
     if (sensor_energy_daily_wh[i]) sensor_energy_daily_wh[i]->publish_state(energy_daily_wh_[i]);
     if (sensor_energy_weekly_wh[i]) sensor_energy_weekly_wh[i]->publish_state(energy_weekly_wh_[i]);
@@ -202,13 +204,23 @@ void Enermon::loop() {
   }
 
   // Save energy counters every 5 minutes to reduce flash wear
-  const unsigned long save_interval = 300000;  // 5 minutes in ms
-  if (energy_changed && (now_ms - last_save_time_ms_ >= save_interval)) {
+  if (now_ms - last_save_ms_ >= 300000) {  // 5 minutes
     save_energy_counters_();
-    last_save_time_ms_ = now_ms;
+    last_save_ms_ = now_ms;
   }
 
   maybe_reset_counters_();
+}
+
+void Enermon::loop() {
+  // Sample every 1 second for accurate energy accumulation
+  static unsigned long last_sample = 0;
+  unsigned long now = millis();
+  
+  if (now - last_sample >= 1000) {
+    last_sample = now;
+    update();
+  }
 }
 
 void Enermon::save_energy_counters_() {

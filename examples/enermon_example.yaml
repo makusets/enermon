@@ -17,15 +17,122 @@ api:
 
 ota:
 
-sensor:
-  - platform: enermon
-    id: enermon_sensor
-    ct_names: ["grid","ev","solar","ac"]
-    ct_pins: [34,35,32,33]
-    ct_cal: [30.0, 30.0, 30.0, 20.0]     # tune per CT with known load
-    voltage_pin: 39
-    voltage_cal: 230.0
-    voltage_phase: 1.0
-    sample_count: 200
+# Configure time for proper energy counter resets
+time:
+  - platform: sntp
+    id: sntp_time
+    timezone: "Your/Timezone"  # e.g., "America/New_York" or "Europe/London"
+
+enermon:
+  id: energy_monitor
+  voltage_pin: 39       # ADC pin for voltage sensor
+  voltage_cal: 60.1    # Voltage calibration
+  voltage_phase: 1.0    # Phase shift calibration
+  sample_count: 200     # Number of samples per measurement
+  
+  # Voltage sensor (optional) - control update rate with filters
+  voltage:
+    name: "Mains Voltage"
+    id: mains_voltage
+    filters:
+      - throttle: 60s  # Update every 60 seconds
+  
+  # Define CT sensors - each with its own pin and calibration
+  sensors:
+    # CT 0 - Grid
+    - ct_pin: 34
+      ct_cal: 30.0
+      current:
+        name: "Grid Current"
+        id: grid_current
+        filters:
+          - throttle: 10s  # Update every 10 seconds
+      power:
+        name: "Grid Power"
+        id: grid_power
+        filters:
+          - throttle: 5s   # Update every 5 seconds (more frequent for power)
+      energy_daily:
+        name: "Grid Energy Daily"
+        id: grid_energy_daily
+        filters:
+          - throttle: 60s  # Update every 60 seconds
+      energy_weekly:
+        name: "Grid Energy Weekly"
+        id: grid_energy_weekly
+        filters:
+          - throttle: 300s  # Update every 5 minutes
+      energy_monthly:
+        name: "Grid Energy Monthly"
+        id: grid_energy_monthly
+        filters:
+          - throttle: 300s  # Update every 5 minutes
+    
+    # CT 1 - EV Charger
+    - ct_pin: 35
+      ct_cal: 30.0
+      current:
+        name: "EV Current"
+        id: ev_current
+        filters:
+          - throttle: 10s
+      power:
+        name: "EV Power"
+        id: ev_power
+        filters:
+          - throttle: 5s
+      energy_daily:
+        name: "EV Energy Daily"
+        id: ev_energy_daily
+        filters:
+          - throttle: 60s
+    
+    # CT 2 - Solar
+    - ct_pin: 32
+      ct_cal: 30.0
+      current:
+        name: "Solar Current"
+        id: solar_current
+        filters:
+          - throttle: 10s
+      power:
+        name: "Solar Power"
+        id: solar_power
+        filters:
+          - throttle: 5s
+      energy_daily:
+        name: "Solar Energy Daily"
+        id: solar_energy_daily
+        filters:
+          - throttle: 60s
+    
+    # CT 3 - AC Unit (with different calibration)
+    - ct_pin: 33
+      ct_cal: 20.0
+      current:
+        name: "AC Current"
+        id: ac_current
+        filters:
+          - throttle: 10s
+      power:
+        name: "AC Power"
+        id: ac_power
+        filters:
+          - throttle: 5s
+      energy_daily:
+        name: "AC Energy Daily"
+        id: ac_energy_daily
+        filters:
+          - throttle: 60s
+
+# Alternative filter options you can use:
+#
+# filters:
+#   - throttle: 30s           # Only send updates every 30 seconds
+#   - heartbeat: 60s          # Send at least one update every 60s even if unchanged
+#   - delta: 0.1              # Only send if value changes by 0.1 or more
+#   - sliding_window_moving_average:  # Smooth out readings
+#       window_size: 5
+#       send_every: 5
 
 
